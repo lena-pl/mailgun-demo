@@ -1,5 +1,7 @@
 <?php
 
+  session_start();
+
   $submitAction = "sendmail.php";
   $errors = [
     'name' => '',
@@ -11,6 +13,14 @@
     'email' => '',
     'message' => '',
   ];
+  if (isset($_SESSION['formdata'])) {
+    $formdata = $_SESSION['formdata'];
+    unset($_SESSION['formdata']);
+  }
+  if (isset($_SESSION['errors'])) {
+    $errors = $_SESSION['errors'];
+    unset($_SESSION['errors']);
+  }
 
 ?>
 
