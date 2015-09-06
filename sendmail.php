@@ -1,5 +1,10 @@
 <?php
 
+require 'config.inc.php';
+
+require 'vendor/autoload.php';
+use Mailgun\Mailgun;
+
 session_start();
 
 if (formIsValid()) {
@@ -43,6 +48,15 @@ function formIsValid() {
 
 
 function sendMail() {
-    echo "Valid!";
+    
+    $mgClient = new Mailgun(MAILGUN_KEY);
+    $result = $mgClient->sendMessage(MAILGUN_DOMAIN, array(
+        'from'    => $_POST['name'] . ' <' . $_POST['email'] . '>',
+        'to'      => 'Lena Plaksina <lena.plaksina@gmail.com>',
+        'subject' => 'Contact Form Submission',
+        'text'    => "Message for you...\n\n" . $_POST['message'],
+    ));
+
+    echo 'Your message has been sent!';
 
 }
