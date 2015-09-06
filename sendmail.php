@@ -19,6 +19,7 @@ function formIsValid() {
         'name' => '',
         'email' => '',
         'message' => '',
+        'recaptcha' => '',
     ];
 
     if (strlen($_POST['name']) < 2) {

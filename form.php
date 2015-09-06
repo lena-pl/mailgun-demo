@@ -1,5 +1,7 @@
 <?php
 
+  require 'config.inc.php';
+
   session_start();
 
   $submitAction = "sendmail.php";
@@ -7,11 +9,13 @@
     'name' => '',
     'email' => '',
     'message' => '',
+    'recaptcha' => '',
   ];
   $formdata = [
     'name' => '',
     'email' => '',
     'message' => '',
+    'recaptcha' => '',
   ];
   if (isset($_SESSION['formdata'])) {
     $formdata = $_SESSION['formdata'];
@@ -21,6 +25,27 @@
     $errors = $_SESSION['errors'];
     unset($_SESSION['errors']);
   }
+
+  function reCaptchaIsValid() {
+    $client = new GuzzleHttp\Client();
+    $url = 'https://www.google.com/recaptcha/api/siteverify';
+    $res = $client->post($url, [
+        'body' => [
+            'secret' => RECAPTCHA_SECRET,
+            'response' => $_POST['g-recaptcha-response'],
+            'remoteip' => $_SERVER['REMOTE_ADDR'],
+        ]
+    ]);
+    $json = $res->getBody();
+    $response = json_decode($json);
+
+    return $response->success;
+  }
+
+  if (! reCaptchaIsValid()) {
+          $isValid = false;
+          $errors['recaptcha'] = "You must prove yourself a human.";
+      }
 
 ?>
 
@@ -86,6 +111,13 @@
             <textarea id="message" class="form-control" name="message" rows="5"
               placeholder="A paragraph about the movie."><?= $formdata['message']; ?></textarea>
             <div class="help-block"><?= $errors['message']; ?></div>
+          </div>
+        </div>
+
+        <div class="form-group <?php if ($errors['recaptcha']): ?> has-error <?php endif; ?>">
+          <div class="col-sm-offset-4 col-sm-10 col-md-offset-2 col-md-10">
+            <div class="g-recaptcha" data-sitekey=<?= RECAPTCHA_SITEKEY ?>></div>
+            <div class="help-block"><?= $errors['recaptcha']; ?></div>
           </div>
         </div>
 
