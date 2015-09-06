@@ -4,6 +4,7 @@ require 'config.inc.php';
 
 require 'vendor/autoload.php';
 use Mailgun\Mailgun;
+use GuzzleHttp;
 
 session_start();
 
@@ -61,3 +62,24 @@ function sendMail() {
     echo 'Your message has been sent!';
 
 }
+
+function reCaptchaIsValid() {
+    $client = new GuzzleHttp\Client();
+    $url = 'https://www.google.com/recaptcha/api/siteverify';
+    $res = $client->post($url, [
+        'body' => [
+            'secret' => RECAPTCHA_SECRET,
+            'response' => $_POST['g-recaptcha-response'],
+            'remoteip' => $_SERVER['REMOTE_ADDR'],
+        ]
+    ]);
+    $json = $res->getBody();
+    $response = json_decode($json);
+
+    return $response->success;
+  }
+
+  if (! reCaptchaIsValid()) {
+          $isValid = false;
+          $errors['recaptcha'] = "You must prove yourself a human.";
+      }

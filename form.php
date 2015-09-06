@@ -26,27 +26,6 @@
     unset($_SESSION['errors']);
   }
 
-  function reCaptchaIsValid() {
-    $client = new GuzzleHttp\Client();
-    $url = 'https://www.google.com/recaptcha/api/siteverify';
-    $res = $client->post($url, [
-        'body' => [
-            'secret' => RECAPTCHA_SECRET,
-            'response' => $_POST['g-recaptcha-response'],
-            'remoteip' => $_SERVER['REMOTE_ADDR'],
-        ]
-    ]);
-    $json = $res->getBody();
-    $response = json_decode($json);
-
-    return $response->success;
-  }
-
-  if (! reCaptchaIsValid()) {
-          $isValid = false;
-          $errors['recaptcha'] = "You must prove yourself a human.";
-      }
-
 ?>
 
 <!DOCTYPE html>
@@ -126,6 +105,9 @@
             <button class="btn btn-success">Send Message</button>
           </div>
         </div>
+      </form>
+
+      <script src='https://www.google.com/recaptcha/api.js'></script>
 
     </div>
   </body>
